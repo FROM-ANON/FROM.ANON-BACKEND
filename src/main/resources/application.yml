@@ -1,7 +1,7 @@
 # 데이터베이스 연결 설정
 spring:
   profiles:
-    active: AWS, MAIL
+    active: AWS, MAIL, JWT
   # Hibernate 설정
   jpa:
     show-sql: true
