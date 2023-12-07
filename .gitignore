@@ -20,6 +20,7 @@ bin/
 ### IntelliJ IDEA ###
 application-AWS.yml
 application-MAIL.yml
+application-JWT.yml
 
 .idea
 *.iws
