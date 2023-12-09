@@ -21,6 +21,7 @@ bin/
 application-AWS.yml
 application-MAIL.yml
 application-JWT.yml
+application-INSTA.yml
 
 .idea
 *.iws
