@@ -1,9 +1,13 @@
 package fromanon.fromanonserver.controller;
 
 import fromanon.fromanonserver.domain.Mail;
+import fromanon.fromanonserver.domain.User;
 import fromanon.fromanonserver.dto.MailResponse;
 import fromanon.fromanonserver.dto.SendMailRequest;
 import fromanon.fromanonserver.service.MailService;
+import fromanon.fromanonserver.service.TokenService;
+import fromanon.fromanonserver.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,42 +22,38 @@ import java.util.Optional;
 public class MailController {
 
     private final MailService mailService;
+    private final TokenService tokenService;
+    private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<Mail> sendMail(@RequestBody SendMailRequest request){
+    public ResponseEntity sendMail(@RequestBody SendMailRequest request){
         Mail savedMail = mailService.save(request);
 
-        //201코드와 테이블에 저장된 savedMail 객체를 반환한다.
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(savedMail);
+                .build();
     }
 
     @GetMapping
-    public ResponseEntity<List<MailResponse>> getAllMails() {
-//        // 현재 사용자의 Authentication 객체를 가져온다.
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        // Authentication 객체에서 현재 사용자의 정보를 추출한다.
-//        Long userId = extractUserIdFromAuthentication(authentication);
-//
-//        // 현재 사용자의 메일만 가져온다.
-//        List<MailResponse> allMails = mailService.getUserinboxMails(userId)
-//                .stream()
-//                .map(MailResponse::new)
-//                .toList();
-//
-//        // 200 코드와 전체 메일 목록을 반환한다.
-//        return ResponseEntity.ok()
-//                .body(allMails);
+    public ResponseEntity<List<MailResponse>> getAllMails(@RequestHeader("Authorization") String authorizationHeader) {
+        try{
+            String accessToken = tokenService.getAccessTokenFromHeader(authorizationHeader);
+            Long instaUserId = tokenService.getInstaUserIdByToken(accessToken);
+            User user = userService.findByInstaUserId(instaUserId);
 
+            //해당 유저의 mail만 가져온다.
+            List<MailResponse> allMails = mailService.findByUser(user)
+                    .stream()
+                    .map(MailResponse::new)
+                    .toList();
 
-        List<MailResponse> allMails = mailService.findAll()
-                .stream()
-                .map(MailResponse::new)
-                .toList();
+            // 200 코드와 전체 메일 목록을 반환한다.
+            return ResponseEntity.ok()
+                    .body(allMails);
+        }catch(ExpiredJwtException ex){
+            //accessToken 만료시 401코드를 반환한다.
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        // 200 코드와 전체 메일 목록을 반환한다.
-        return ResponseEntity.ok()
-                .body(allMails);
     }
 
     @GetMapping("/{mailId}")

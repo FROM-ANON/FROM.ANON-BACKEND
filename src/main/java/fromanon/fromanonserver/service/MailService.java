@@ -48,8 +48,8 @@ public class MailService {
         return mailRepository.findAll();
     }
     //해당 사용자의 편지 전체 조회 메서드
-    public List<Mail> getUserinboxMails(Long userId) {
-        return mailRepository.findByUserId(userId);
+    public List<Mail> findByUser(User user) {
+        return mailRepository.findByUser(user);
     }
     //편지 아이디로 조회 메서드
     public Mail findById(Long mailId) {
