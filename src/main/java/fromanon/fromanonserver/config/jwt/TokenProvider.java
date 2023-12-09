@@ -58,10 +58,6 @@ public class TokenProvider {
             return false;
         }
     }
-
-    //토큰 기반으로 인증 정보를 가져오는 메서드
-
-
     //토큰 기반으로 유저 InstaUserId를 가져오는 메서드
     public Long getInstaUserId(String token) {
         Claims claims = getClaims(token);

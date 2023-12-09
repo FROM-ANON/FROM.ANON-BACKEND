@@ -53,7 +53,7 @@ public class TokenService {
         return authorizationHeader.substring("Bearer ".length());
     }
 
-    //토큰으로 유저 ID 값을 찾아 반환한다.
+    //토큰으로 유저 InstaUserId 값을 찾아 반환한다.
     public Long getInstaUserIdByToken(String token){
         return tokenProvider.getInstaUserId(token);
     }

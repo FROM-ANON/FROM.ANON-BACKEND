@@ -57,40 +57,82 @@ public class MailController {
     }
 
     @GetMapping("/{mailId}")
-    public ResponseEntity<MailResponse> getMail(@PathVariable Long mailId) {
-       Mail mail = mailService.findById(mailId);
+    public ResponseEntity<MailResponse> getMail(@PathVariable Long mailId, @RequestHeader("Authorization") String authorizationHeader) {
+       try{
+           String accessToken = tokenService.getAccessTokenFromHeader(authorizationHeader);
+           Long userId = tokenService.getInstaUserIdByToken(accessToken);
 
-        return ResponseEntity.ok()
-                .body(new MailResponse(mail));
+           Mail mail = mailService.findById(mailId);
+
+           return ResponseEntity.ok()
+                   .body(new MailResponse(mail));
+       }catch(ExpiredJwtException ex){
+        //accessToken 만료시 401코드를 반환한다.
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+
+
     }
 
     @DeleteMapping("/{mailId}")
-    public ResponseEntity<Void> deleteMail(@PathVariable Long mailId){
-        mailService.delete(mailId);
-        return ResponseEntity.ok()
-                .build();
+    public ResponseEntity<Void> deleteMail(@PathVariable Long mailId, @RequestHeader("Authorization") String authorizationHeader){
+        try {
+            String accessToken = tokenService.getAccessTokenFromHeader(authorizationHeader);
+            Long instaUserId = tokenService.getInstaUserIdByToken(accessToken);
+
+            Mail mail = mailService.findById(mailId);
+
+            //본인이 메일 수신자인 경우에만 삭제 가능
+            if (instaUserId.equals(mail.getUser().getInstaUserId())) {
+
+                mailService.delete(mailId);
+                return ResponseEntity.ok()
+                        .build();
+            }
+            //본인이 메일 수신자가 아닌 경우 403코드를 반환한다.
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }catch(ExpiredJwtException ex){
+                //accessToken 만료시 401코드를 반환한다.
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PostMapping("/report/{mailId}")
-    public ResponseEntity<Void> reportMail(@PathVariable Long mailId){
-        Mail mail = mailService.findById(mailId);
+    public ResponseEntity<Void> reportMail(@PathVariable Long mailId, @RequestHeader("Authorization") String authorizationHeader){
+        try{
+            String accessToken = tokenService.getAccessTokenFromHeader(authorizationHeader);
+            Long instaUserId = tokenService.getInstaUserIdByToken(accessToken);
 
-        //mail의 정보를 from.anonnn@gmail.com으로 보낸다.
-        String to = "from.anonnn@gmail.com";
-        String subject = "[편지 신고] Id: " + mailId + " ) 편지 신고가 접수되었습니다.";
-        // HTML 형식으로 메일 본문 작성
-        String body = "<p><strong>편지 정보</strong></p>"
-                + "<ul>"
-                + "<li>mailId : " + mail.getId() + "</li>"
-                + "<li>userId : " + mail.getUser().getId() + "</li>"
-                + "<li>mailPaperId : " + mail.getMailPaper().getId() + "</li>"
-                + "<li>text : " + mail.getText() + "</li>"
-                + "<li>createdTime : " + mail.getCreatedTime() + "</li>"
-                + "</ul>";
+            Mail mail = mailService.findById(mailId);
 
-        mailService.sendReportMail(to, subject, body);
+            //본인이 메일 수신자인 경우에만 신고 가능
+            if (instaUserId.equals(mail.getUser().getInstaUserId())) {
+                //mail의 정보를 from.anonnn@gmail.com으로 보낸다.
+                String to = "from.anonnn@gmail.com";
+                String subject = "[편지 신고] Id: " + mailId + " ) 편지 신고가 접수되었습니다.";
+                // HTML 형식으로 메일 본문 작성
+                String body = "<p><strong>편지 정보</strong></p>"
+                        + "<ul>"
+                        + "<li>mailId : " + mail.getId() + "</li>"
+                        + "<li>userId : " + mail.getUser().getId() + "</li>"
+                        + "<li>mailPaperId : " + mail.getMailPaper().getId() + "</li>"
+                        + "<li>text : " + mail.getText() + "</li>"
+                        + "<li>createdTime : " + mail.getCreatedTime() + "</li>"
+                        + "</ul>";
 
-        return ResponseEntity.ok()
-                .build();
+                mailService.sendReportMail(to, subject, body);
+
+                return ResponseEntity.ok()
+                        .build();
+            }
+            //본인이 메일 수신자가 아닌 경우 403코드를 반환한다.
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }catch(ExpiredJwtException ex){
+            //accessToken 만료시 401코드를 반환한다.
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+
     }
 }
