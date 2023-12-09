@@ -34,10 +34,10 @@ public class User  {
     @ColumnDefault("false")
     private boolean pro;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Mail> mails = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<FavoriteMailPaper> favoriteMailPapers = new ArrayList<>();
 
     @Builder
