@@ -2,6 +2,7 @@ package fromanon.fromanonserver.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +30,10 @@ public class Mail {
 
     @Column(name="CREATED_TIME", nullable = false)
     private String createdTime;
+
+    @Column(name="IS_READ", nullable = false)
+    @ColumnDefault("false")
+    private boolean isRead;
 
     private String getLocalDateTime() {
         // 현재 시간을 얻기

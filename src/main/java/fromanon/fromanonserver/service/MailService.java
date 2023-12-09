@@ -76,4 +76,9 @@ public class MailService {
         }
     }
 
+    //메일 열람 정보 update 메서드
+    public void updateIsRead(Long mailId, Boolean isRead){
+        mailRepository.updateIsRead(mailId, isRead);
+    }
+
 }

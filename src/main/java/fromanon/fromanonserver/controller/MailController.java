@@ -11,6 +11,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class MailController {
 
     @PostMapping
     public ResponseEntity sendMail(@RequestBody SendMailRequest request){
+        request.setRead(false);
         Mail savedMail = mailService.save(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -55,7 +57,31 @@ public class MailController {
         }
 
     }
+    @GetMapping("/notread")
+    public ResponseEntity<List<MailResponse>> getAllIsNoReadMails(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String accessToken = tokenService.getAccessTokenFromHeader(authorizationHeader);
+            Long instaUserId = tokenService.getInstaUserIdByToken(accessToken);
+            User user = userService.findByInstaUserId(instaUserId);
 
+            // 해당 유저의 isRead가 false인 메일만 가져온다.
+            List<MailResponse> noReadMails = mailService.findByUser(user)
+                    .stream()
+                    .filter(mail -> !mail.isRead()) // isRead가 false인 것만 필터링
+                    .map(MailResponse::new)
+                    .toList();
+
+            // 200 코드와 읽지 않은 메일 목록을 반환한다.
+            return ResponseEntity.ok()
+                    .body(noReadMails);
+        } catch (ExpiredJwtException ex) {
+            // accessToken 만료시 401코드를 반환한다.
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+
+    @Transactional
     @GetMapping("/{mailId}")
     public ResponseEntity<MailResponse> getMail(@PathVariable Long mailId, @RequestHeader("Authorization") String authorizationHeader) {
        try{
@@ -63,6 +89,8 @@ public class MailController {
            Long userId = tokenService.getInstaUserIdByToken(accessToken);
 
            Mail mail = mailService.findById(mailId);
+           //메일 열람 정보를 true로 바꾼다.
+           mailService.updateIsRead(mailId, true);
 
            return ResponseEntity.ok()
                    .body(new MailResponse(mail));

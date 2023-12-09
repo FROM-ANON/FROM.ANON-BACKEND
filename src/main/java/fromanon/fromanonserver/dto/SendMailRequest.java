@@ -12,5 +12,9 @@ public class SendMailRequest {
     private Long userId;
     private Long mailPaperId;
     private String text;
+    private Boolean isRead;
 
+    public void setRead(Boolean read) {
+        isRead = read;
+    }
 }
