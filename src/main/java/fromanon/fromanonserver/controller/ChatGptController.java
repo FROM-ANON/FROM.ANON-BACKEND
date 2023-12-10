@@ -19,13 +19,17 @@ public class ChatGptController {
     @PostMapping
     public ResponseEntity checkContent(@RequestBody ChatRequest request){
         String content = request.getContent();
-        if(chatGPTClient.checkContent(content)){
+        int resultCode = chatGPTClient.checkContent(content);
+        if(resultCode == 1){
             // 비방성 - 성희롱성 문구일시 406 상태 코드 반환
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                     .build();
 
-        }else{
+        }else if(resultCode == 2) {
             return ResponseEntity.ok()
+                    .build();
+        }else{
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .build();
         }
     }
