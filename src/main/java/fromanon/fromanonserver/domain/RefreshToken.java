@@ -14,7 +14,7 @@ public class RefreshToken {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false)
     private Long instaUserId;
 
     @Column(name = "refresh_token", nullable = false)
