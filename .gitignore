@@ -18,9 +18,9 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-application-AWS.yml
-application-MAIL.yml
+application-aws.yml
 application-JWT.yml
+application-MAIL.yml
 application-INSTA.yml
 
 .idea
