@@ -22,6 +22,7 @@ application-aws.yml
 application-JWT.yml
 application-MAIL.yml
 application-INSTA.yml
+application-OPENAI.yml
 
 .idea
 *.iws
