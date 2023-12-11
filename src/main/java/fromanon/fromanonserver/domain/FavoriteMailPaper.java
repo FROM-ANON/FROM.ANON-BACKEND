@@ -23,4 +23,11 @@ public class FavoriteMailPaper {
     @JoinColumn(name = "MAILPAPER_ID")
     private MailPaper mailPaper;
 
+    @Builder
+    public FavoriteMailPaper(MailPaper mailPaper, User user){
+        this.mailPaper = mailPaper;
+        this.user = user;
+    }
+
+
 }

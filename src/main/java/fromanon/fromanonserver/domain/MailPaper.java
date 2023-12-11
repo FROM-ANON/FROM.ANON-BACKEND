@@ -17,13 +17,8 @@ public class MailPaper {
 
     @Column(name="PRO", nullable = false)
     private boolean pro;
-
-    @Column(name="S3_ADDRESS", nullable = false)
-    private String s3Address;
-
     @Builder
-    public MailPaper(boolean pro, String s3Address){
+    public MailPaper(boolean pro){
         this.pro = pro;
-        this.s3Address = s3Address;
     }
 }

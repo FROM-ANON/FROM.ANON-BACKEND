@@ -8,6 +8,7 @@ import fromanon.fromanonserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,12 @@ public class MailPaperService {
 
     private final MailPaperRepository mailPaperRepository;
 
-    public MailPaper getMailPaperById(Long mailPaperId){
-        return mailPaperRepository.getReferenceById(mailPaperId);
+    public List<MailPaper> findAll(){
+        return mailPaperRepository.findAll();
+    }
+
+    public MailPaper findById(Long mailpaperId){
+        return mailPaperRepository.findById(mailpaperId)
+                .orElseThrow(() -> new IllegalArgumentException("Mailpaper not found with id: " + mailpaperId));
     }
 }
