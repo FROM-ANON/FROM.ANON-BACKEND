@@ -29,7 +29,8 @@ public class MailService {
 
     public Mail toEntity(SendMailRequest request){
         //userId, mailPaperId를 사용해 user, mailPaper 엔티티를 가져온다.
-        User user = userRepository.getReferenceById(request.getUserId());
+        User user = userRepository.findByInstaId(request.getInstaId())
+                .orElseThrow(()->new IllegalArgumentException(("user not found: " + request.getInstaId())));
         MailPaper mailPaper = mailPaperRepository.getReferenceById(request.getMailPaperId());
         //Mail 객체를 만들어 리턴한다.
         return Mail.builder()

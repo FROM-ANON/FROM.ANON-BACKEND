@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class SendMailRequest {
 
-    private Long userId;
+    private String instaId;
     private Long mailPaperId;
     private String text;
     private Boolean isRead;
