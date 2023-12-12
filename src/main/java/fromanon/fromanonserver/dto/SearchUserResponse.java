@@ -8,4 +8,5 @@ public class SearchUserResponse {
     private Long userId;
     private Long instaUserId;
     private String instaId;
+    private boolean pro;
 }

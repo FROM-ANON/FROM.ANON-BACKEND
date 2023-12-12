@@ -58,6 +58,7 @@ public class UserService  {
         response.setUserId(user.getId());
         response.setInstaId(user.getInstaId());
         response.setInstaUserId(user.getInstaUserId());
+        response.setPro(user.isPro());
         return response;
     }
 }
