@@ -42,6 +42,23 @@ public class UserController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<SearchUserResponse> getUserByToken(@RequestHeader("Authorization") String authorizationHeader){
+        try {
+            String accessToken = tokenService.getAccessTokenFromHeader(authorizationHeader);
+            Long instaUserId = tokenService.getInstaUserIdByToken(accessToken);
+            User user = userService.findByInstaUserId(instaUserId);
+
+            SearchUserResponse response = userService.findUserDtoById(user.getId());
+
+            return ResponseEntity.ok()
+                    .body(response);
+
+        }catch(ExpiredJwtException ex){
+            //accessToken 만료시 401코드를 반환한다.
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
     //사용자 검색
     @GetMapping("/search")
     public ResponseEntity<List<SearchUserResponse>> searchUser(@RequestParam String searchWord){
